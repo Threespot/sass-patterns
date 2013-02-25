@@ -28,11 +28,12 @@ Working demo page [http://jsbin.com/ufiful/latest](http://jsbin.com/ufiful/lates
 		$index: 1;
 	
 		/* Loop through each breakpoint and generated the appropriate media query code */
+		/* Set the font-family on the pseudo element, as iOS 4 cannot get the CSS content with JS */
 		@each $break in $breakpoints {
 			/* First Breakpoint */
 			@if $index == 1 {
 				@media (max-width: calc-em( nth($break, 2) ))  {
-					body:after { content: '#{nth($break, 1)}' }
+					body:after { font-family: '#{nth($break, 1)}' }
 				};
 			}
 			/* Last Breakpoint */
@@ -41,7 +42,7 @@ Working demo page [http://jsbin.com/ufiful/latest](http://jsbin.com/ufiful/lates
 				$min-width: nth( nth($breakpoints, $index - 1), 2 ) + 1;
 			
 				@media (min-width: calc-em( $min-width )) {
-					body:after { content: '#{nth($break, 1)}' }
+					body:after { font-family: '#{nth($break, 1)}' }
 				};
 			}
 			/* All Other Breakpoints */
@@ -50,7 +51,7 @@ Working demo page [http://jsbin.com/ufiful/latest](http://jsbin.com/ufiful/lates
 				$min-width: nth( nth($breakpoints, $index - 1), 2 ) + 1;
 			
 				@media (min-width: calc-em( $min-width )) and (max-width: calc-em( nth($break, 2) )) {
-					body:after { content: '#{nth($break, 1)}' }
+					body:after { font-family: '#{nth($break, 1)}' }
 				};
 			}
 		
