@@ -28,12 +28,12 @@ Working demo page [http://jsbin.com/ufiful/latest](http://jsbin.com/ufiful/lates
 		$index: 1;
 	
 		/* Loop through each breakpoint and generated the appropriate media query code */
-		/* Set the font-family on the pseudo element, as iOS 4 cannot get the CSS content with JS */
-		@each $break in $breakpoints {
+		/* Set label as font-family on the <html> element, as not all borwsers support getComputedStyle on pseudo elements http://caniuse.com/getcomputedstyle */
 			/* First Breakpoint */
 			@if $index == 1 {
 				@media (max-width: calc-em( nth($break, 2) ))  {
-					body:after { font-family: '#{nth($break, 1)}' }
+					html { font-family: '#{nth($break, 1)}' }
+					body:after { content: '#{nth($break, 1)}' }
 				};
 			}
 			/* Last Breakpoint */
@@ -42,7 +42,8 @@ Working demo page [http://jsbin.com/ufiful/latest](http://jsbin.com/ufiful/lates
 				$min-width: nth( nth($breakpoints, $index - 1), 2 ) + 1;
 			
 				@media (min-width: calc-em( $min-width )) {
-					body:after { font-family: '#{nth($break, 1)}' }
+					html { font-family: '#{nth($break, 1)}' }
+					body:after { content: '#{nth($break, 1)}' }
 				};
 			}
 			/* All Other Breakpoints */
@@ -51,7 +52,8 @@ Working demo page [http://jsbin.com/ufiful/latest](http://jsbin.com/ufiful/lates
 				$min-width: nth( nth($breakpoints, $index - 1), 2 ) + 1;
 			
 				@media (min-width: calc-em( $min-width )) and (max-width: calc-em( nth($break, 2) )) {
-					body:after { font-family: '#{nth($break, 1)}' }
+					html { font-family: '#{nth($break, 1)}' }
+					body:after { content: '#{nth($break, 1)}' }
 				};
 			}
 		
@@ -67,6 +69,10 @@ Working demo page [http://jsbin.com/ufiful/latest](http://jsbin.com/ufiful/lates
 
 	@include mq-breakpoints();
 
+	/* Make sure to reset your fonts afterward */
+	body {
+		font-family: "Hoefler Text", Baskerville, Garamond, "Palatino Linotype", Georgia, "Times New Roman", serif;
+	}
 ###CSS:
 
 	@media (max-width: 20em) {
@@ -97,6 +103,10 @@ Working demo page [http://jsbin.com/ufiful/latest](http://jsbin.com/ufiful/lates
 	  body:after {
 	    content: "epsilon";
 	  }
+	}
+	
+	body {
+		font-family: "Hoefler Text", Baskerville, Garamond, "Palatino Linotype", Georgia, "Times New Roman", serif;
 	}
 
 **Attribution**: Inspired by Jeremy Keith's [Conditional CSS](http://adactio.com/journal/5429/) and [The Sass Way](http://thesassway.com/intermediate/responsive-web-design-in-sass-using-media-queries-in-sass-32)
