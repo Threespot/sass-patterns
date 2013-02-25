@@ -1,4 +1,4 @@
-# Retina Media Query Mixin
+# Convert px to em
 
 ## The Mixin:
 
