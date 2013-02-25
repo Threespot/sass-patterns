@@ -1,0 +1,62 @@
+/* Convert px to em */
+@function calc-em( $px, $base: 16px ) {
+	
+	@if unitless( $px ) {
+		$px: $px * 1px;
+	}
+	
+	@if unitless( $base ) {
+		$base: $base * 1px;
+	}
+
+	@return ($px / $base) * 1em;
+}
+
+/* Add Breakpoint Labels to Body */
+$breakpoints: alpha 320,
+              beta 480,
+              gamma 568,
+              delta 768,
+              epsilon;
+
+@mixin mq-breakpoints() {
+	/* Hide generated content */
+	body:after {display: none}
+	
+	/* Get number of breakpoints */
+	$break-count: length($breakpoints);
+	
+	/* Create index var to use in @each loop */
+	$index: 1;
+	
+	/* Loop through each breakpoint and generated the appropriate media query code */
+	@each $break in $breakpoints {
+		/* First Breakpoint */
+		@if $index == 1 {
+			@media (max-width: calc-em( nth($break, 2) ))  {
+				body:after { content: '#{nth($break, 1)}' }
+			};
+		}
+		/* Last Breakpoint */
+		@else if $index == $break-count {
+			/* Get previous breakpoint width */
+			$min-width: nth( nth($breakpoints, $index - 1), 2 ) + 1;
+			
+			@media (min-width: calc-em( $min-width )) {
+				body:after { content: '#{nth($break, 1)}' }
+			};
+		}
+		/* All Other Breakpoints */
+		@else {
+			/* Get previous breakpoint width */
+			$min-width: nth( nth($breakpoints, $index - 1), 2 ) + 1;
+			
+			@media (min-width: calc-em( $min-width )) and (max-width: calc-em( nth($break, 2) )) {
+				body:after { content: '#{nth($break, 1)}' }
+			};
+		}
+		
+		/* Increment counter */
+		$index: $index + 1;
+	}
+}
