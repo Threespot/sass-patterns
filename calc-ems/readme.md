@@ -2,12 +2,20 @@
 
 ## The Mixin:
 
-	@function calc-em($px, $base: 16px) {
+	@function calc-em( $px, $base: 16px ) {
+	
+		@if unitless( $px ) {
+			$px: $px * 1px;
+		}
+	
+		@if unitless( $base ) {
+			$base: $base * 1px;
+		}
+
 		@return ($px / $base) * 1em;
 	}
 
 ## Usage
-
 
 ###Sass:
 
