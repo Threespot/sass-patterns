@@ -2,14 +2,19 @@
 
 ## The Mixin:
 
-	@mixin retina-display {
-		@media only screen and 
-		(-webkit-min-device-pixel-ratio: 2), 
-		(min-resolution: 192dpi) { 
+	@mixin hires-mq( $ratio ) {
+		@media only screen and (-webkit-min-device-pixel-ratio: $ratio), only screen and (min-resolution: ($ratio * 96) + 'dpi') {
 			@content;
 		}
 	}
 
-Pretty straightforward: only delivers content if browser has a high display density.
+Usage:
 
-MQ Attribution: [CSS Tricks](http://css-tricks.com/snippets/css/retina-display-media-query/)
+	.hires .logo {
+		hires-mq( 2 ) {
+			background-image: url('../img/logo@2x.png');
+			background-size: 100px 50px;
+		}
+	}
+
+Attribution: Inspired by [http://www.brettjankord.com/2012/11/28/cross-browser-retinahigh-resolution-media-queries/](http://www.brettjankord.com/2012/11/28/cross-browser-retinahigh-resolution-media-queries/)
