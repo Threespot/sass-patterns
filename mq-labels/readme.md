@@ -10,54 +10,84 @@ Working demo page [http://jsbin.com/ufiful/latest](http://jsbin.com/ufiful/lates
 
 ## The Mixin:
 
-	/* Add Breakpoint Labels to Body */
-	$breakpoints: alpha 320,
-	              beta 480,
-	              gamma 568,
-	              delta 768,
-	              epsilon;
+	@function makePixel( $val ) {
+		@if unitless( $val ) {
+			$val: $val * 1px;
+		}
+		@return $val;
+	}
 
-	@mixin mq-breakpoints() {
-		/* Hide generated content */
-		body:after {display: none}
-	
-		/* Get number of breakpoints */
+	@function calc-em( $px, $base: 16px ) {
+		@return ( makePixel($px) / makePixel($base) ) * 1em;
+	}
+
+
+	/* Add Breakpoint Labels (for use in JS) */
+	// References:
+	// http://adactio.com/journal/5429/
+	// http://thesassway.com/intermediate/responsive-web-design-in-sass-using-media-queries-in-sass-32
+	// https://github.com/registerguard/js-media-queries
+
+	// Default breakpoints if not defined
+	$breakpoints: small,
+	              medium 768,
+	              large 960 !default;
+
+	// Get number of breakpoints
+	$break-count: length($breakpoints);
+
+	// Iterate through breakpoints
+	@mixin mq-breakpoints( $font-stack: "'Helvetica Neue', Arial, Helvetica, sans-serif" ) {
+
+		// Fallback label
+		html { font-family: "#{nth( nth($breakpoints, 1), 1 )}" }
+
+		// Override <html> inheritance.
+		body { font-family: #{$font-stack} }
+
+		body:after {
+			content: "#{nth( nth($breakpoints, 1), 1 )}";
+			display: none;
+		}
+
+		// Get number of breakpoints
 		$break-count: length($breakpoints);
 	
-		/* Create index var to use in @each loop */
+		// Create index var to use in @each loop
 		$index: 1;
 	
-		/* Loop through each breakpoint and generated the appropriate media query code */
-		/* Set label as font-family on the <html> element, as not all borwsers support getComputedStyle on pseudo elements http://caniuse.com/getcomputedstyle */
-			/* First Breakpoint */
+		// Loop through each breakpoint and generated the appropriate media query code
+		// Set the font-family on the pseudo element, as iOS 4 cannot get the CSS content with JS
+		@each $break in $breakpoints {
+			// First breakpoint
 			@if $index == 1 {
-				@media (max-width: calc-em( nth($break, 2) ))  {
+				// Get next breakpoint width, subtract 1px
+				$max-width: nth( nth($breakpoints, $index + 1), 2 ) - 1;
+
+				@media ( max-width: calc-em( $max-width ) )  {
 					html { font-family: '#{nth($break, 1)}' }
 					body:after { content: '#{nth($break, 1)}' }
 				};
 			}
-			/* Last Breakpoint */
+			// Last breakpoint
 			@else if $index == $break-count {
-				/* Get previous breakpoint width */
-				$min-width: nth( nth($breakpoints, $index - 1), 2 ) + 1;
-			
-				@media (min-width: calc-em( $min-width )) {
+				@media ( min-width: calc-em( nth($break, 2) ) ) {
 					html { font-family: '#{nth($break, 1)}' }
 					body:after { content: '#{nth($break, 1)}' }
 				};
 			}
-			/* All Other Breakpoints */
+			// All other breakpoints
 			@else {
-				/* Get previous breakpoint width */
-				$min-width: nth( nth($breakpoints, $index - 1), 2 ) + 1;
+				// Get next breakpoint width, subtract 1px
+				$max-width: nth( nth($breakpoints, $index + 1), 2 ) - 1;
 			
-				@media (min-width: calc-em( $min-width )) and (max-width: calc-em( nth($break, 2) )) {
+				@media ( min-width: calc-em( nth($break, 2) ) ) and ( max-width: calc-em( $max-width ) ) {
 					html { font-family: '#{nth($break, 1)}' }
 					body:after { content: '#{nth($break, 1)}' }
 				};
 			}
 		
-			/* Increment counter */
+			// Increment counter
 			$index: $index + 1;
 		}
 	}
@@ -69,44 +99,31 @@ Working demo page [http://jsbin.com/ufiful/latest](http://jsbin.com/ufiful/lates
 
 	@include mq-breakpoints();
 
-	/* Make sure to reset your fonts afterward */
-	body {
-		font-family: "Hoefler Text", Baskerville, Garamond, "Palatino Linotype", Georgia, "Times New Roman", serif;
-	}
 ###CSS:
 
-	@media (max-width: 20em) {
-	  body:after {
-	    content: "alpha";
-	  }
+	/* Add breakpoint labels for JS purposes */
+	html { font-family: "small" }
+
+	body { font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif }
+
+	body:after {
+	  content: "small";
+	  display: none;
 	}
 
-	@media (min-width: 20.0625em) and (max-width: 30em) {
-	  body:after {
-	    content: "beta";
-	  }
+	@media (max-width: 47.9375em) {
+	  html { font-family: "small" }
+	  body:after { content: "small" }
 	}
 
-	@media (min-width: 30.0625em) and (max-width: 35.5em) {
-	  body:after {
-	    content: "gamma";
-	  }
+	@media (min-width: 48em) and (max-width: 59.9375em) {
+	  html { font-family: "medium" }
+	  body:after { content: "medium" }
 	}
 
-	@media (min-width: 35.5625em) and (max-width: 48em) {
-	  body:after {
-	    content: "delta";
-	  }
+	@media (min-width: 60em) {
+	  html { font-family: "large" }
+	  body:after { content: "large" }
 	}
 
-	@media (min-width: 48.0625em) {
-	  body:after {
-	    content: "epsilon";
-	  }
-	}
-	
-	body {
-		font-family: "Hoefler Text", Baskerville, Garamond, "Palatino Linotype", Georgia, "Times New Roman", serif;
-	}
-
-**Attribution**: Inspired by Jeremy Keith's [Conditional CSS](http://adactio.com/journal/5429/) and [The Sass Way](http://thesassway.com/intermediate/responsive-web-design-in-sass-using-media-queries-in-sass-32)
+**Attribution**: Inspired by Jeremy Keith's [Conditional CSS](http://adactio.com/journal/5429/) and [The Sass Way](http://thesassway.com/intermediate/responsive-web-design-in-sass-using-media-queries-in-sass-32). For use with [onMediaQuery](https://github.com/registerguard/js-media-queries), developed by Josh Barr and forked by [registerguard](https://github.com/registerguard).
