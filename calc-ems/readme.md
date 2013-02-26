@@ -1,18 +1,16 @@
 # Convert px to em
 
-## The Mixin:
+## The Functions:
+
+	@function makePixel( $val ) {
+		@if unitless( $val ) {
+			$val: $val * 1px;
+		}
+		@return $val;
+	}
 
 	@function calc-em( $px, $base: 16px ) {
-	
-		@if unitless( $px ) {
-			$px: $px * 1px;
-		}
-	
-		@if unitless( $base ) {
-			$base: $base * 1px;
-		}
-
-		@return ($px / $base) * 1em;
+		@return ( makePixel($px) / makePixel($base) ) * 1em;
 	}
 
 ## Usage
