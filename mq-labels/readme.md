@@ -10,19 +10,10 @@ Working demo page [http://jsbin.com/ufiful/latest](http://jsbin.com/ufiful/lates
 
 ## The Mixin:
 
-	@function makePixel( $val ) {
-		@if unitless( $val ) {
-			$val: $val * 1px;
-		}
-		@return $val;
-	}
-
-	@function calc-em( $px, $base: 16px ) {
-		@return ( makePixel($px) / makePixel($base) ) * 1em;
-	}
-
-
 	/* Add Breakpoint Labels (for use in JS) */
+
+	$fixed-width: false !default;
+
 	// References:
 	// http://adactio.com/journal/5429/
 	// http://thesassway.com/intermediate/responsive-web-design-in-sass-using-media-queries-in-sass-32
@@ -64,14 +55,14 @@ Working demo page [http://jsbin.com/ufiful/latest](http://jsbin.com/ufiful/lates
 				// Get next breakpoint width, subtract 1px
 				$max-width: nth( nth($breakpoints, $index + 1), 2 ) - 1;
 
-				@media ( max-width: calc-em( $max-width ) )  {
+				@media ( max-width: em( $max-width ) )  {
 					html { font-family: '#{nth($break, 1)}' }
 					body:after { content: '#{nth($break, 1)}' }
 				};
 			}
 			// Last breakpoint
 			@else if $index == $break-count {
-				@media ( min-width: calc-em( nth($break, 2) ) ) {
+				@media ( min-width: em( nth($break, 2) ) ) {
 					html { font-family: '#{nth($break, 1)}' }
 					body:after { content: '#{nth($break, 1)}' }
 				};
@@ -81,7 +72,7 @@ Working demo page [http://jsbin.com/ufiful/latest](http://jsbin.com/ufiful/lates
 				// Get next breakpoint width, subtract 1px
 				$max-width: nth( nth($breakpoints, $index + 1), 2 ) - 1;
 			
-				@media ( min-width: calc-em( nth($break, 2) ) ) and ( max-width: calc-em( $max-width ) ) {
+				@media ( min-width: em( nth($break, 2) ) ) and ( max-width: em( $max-width ) ) {
 					html { font-family: '#{nth($break, 1)}' }
 					body:after { content: '#{nth($break, 1)}' }
 				};
