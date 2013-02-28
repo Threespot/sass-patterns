@@ -8,35 +8,32 @@ Easily generate min-width and max-width media queries based on breakpoint labels
 	// Reference:
 	// http://jakearchibald.github.com/sass-ie/
 
+	$fixed-width: false !default;
+
 	// Default breakpoints if not defined
 	$breakpoints: small,
 	              medium 768,
 	              large 960 !default;
 
-	// Get number of breakpoints
+	// Number of breakpoints
 	$break-count: length($breakpoints);
 
-	// Set to a px value to trigged fixed layout
-	$fix-mqs: false !default;
-
-	// Min-width breakpoint mixin
 	@mixin breakpoint( $name ) {
-		$width: 0;
 		$index: 1; // Create index var to use in @each loop
 
 		// Find width cutoff of breakpoint
 		@each $break in $breakpoints {
 			@if $name == nth($break, 1) {
 			
-				// Output plain CSS if fixed width is >= $width
-				@if $fix-mqs {
-					@if $index == 1 or $fix-mqs >= nth($break, 2) {
+				// Output plain CSS if fixed width is >= current breakpoint width
+				@if $fixed-width {
+					@if $index == 1 or $fixed-width >= nth($break, 2) {
 						@content;
 					}
 				}
 				// Wrap code in media query
 				@else if $index > 1 {
-					@media only screen and ( min-width: calc-em( nth($break, 2) ) ) {
+					@media only screen and ( min-width: em( nth($break, 2) ) ) {
 						@content;
 					}
 				}
@@ -51,33 +48,38 @@ Easily generate min-width and max-width media queries based on breakpoint labels
 		}
 	}
 
-	// Max-width breakpoint mixin
+
 	@mixin max-breakpoint( $name ) {
-		$width: 0;
 		$index: 1; // Create index var to use in @each loop
 
 		// Find width cutoff of breakpoint
 		@each $break in $breakpoints {
 			@if $name == nth($break, 1) {
-			
-				// Output plain CSS if fixed width is >= $width
-				@if $fix-mqs {
-					@if $index == $break-count or $fix-mqs >= $width {
+
+				// Check if fixed width has been set
+				@if $fixed-width {
+					// For first breakpoint, add styles if fixed width is < second breakpoint
+					@if $index == 1 and $fixed-width < px( nth( nth($breakpoints, 2), 2 ) ) {
+						@content;
+					}
+					// For all other breakopints, add styles if fixed width <= breakpoint
+					@else if $index > 1 and $fixed-width <= nth($break, 2) {
 						@content;
 					}
 				}
-				// Wrap code in media query
+				// If not fixed width, add appropriate media query
 				@else if $index < $break-count {
 					// Get next breakpoint width, subtract 1px
 					$max-width: nth( nth($breakpoints, $index + 1), 2 ) - 1;
 				
-					@media only screen and ( max-width: calc-em( $max-width ) ) {
+					@media only screen and ( max-width: em( $max-width ) ) {
 						@content;
 					}
 				}
-				// Largest breakpoint
+				// Last breakpoint
 				@else {
-					@media only screen and ( max-width: calc-em( nth($break, 2) ) ) {
+					// Use breakpoint width
+					@media only screen and ( max-width: em( nth($break, 2) ) ) {
 						@content;
 					}
 				}
@@ -88,7 +90,6 @@ Easily generate min-width and max-width media queries based on breakpoint labels
 		}
 	}
 
-
 ## Usage
 
 ###Sass:
@@ -97,7 +98,7 @@ Easily generate min-width and max-width media queries based on breakpoint labels
 	h1 {
 		color: #555;
 	
-		/* This is just for testing. You would not normally use a media query for the smallest view. */
+		// This is just for testing. You would not normally use a media query for the smallest view.
 		@include breakpoint( small ) {
 			color: red;
 		}
@@ -105,6 +106,7 @@ Easily generate min-width and max-width media queries based on breakpoint labels
 		@include breakpoint( medium ) {
 			color: green;
 		}
+		
 		@include breakpoint( large ) {
 			color: blue;
 		}
@@ -112,8 +114,7 @@ Easily generate min-width and max-width media queries based on breakpoint labels
 
 	/* Max-width Tests */
 	h1 {
-	
-		/* This is just for testing. You would not normally use a media query for the largest view. */
+		// This is just for testing. You would not normally use a media query for the largest view.
 		@include max-breakpoint( large ) {
 			font-size: 40px;
 		}
@@ -121,6 +122,7 @@ Easily generate min-width and max-width media queries based on breakpoint labels
 		@include max-breakpoint( medium ) {
 			font-size: 30px;
 		}
+		
 		@include max-breakpoint( small ) {
 			font-size: 20px;
 		}
