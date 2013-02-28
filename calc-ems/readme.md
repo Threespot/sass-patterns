@@ -2,15 +2,22 @@
 
 ## The Functions:
 
-	@function makePixel( $val ) {
-		@if unitless( $val ) {
-			$val: $val * 1px;
+	/* Convert value to px */
+	@function px( $val ) {
+		// Return value if already in pixels
+		@if unit( $val ) == 'px' {
+			@return $val;
 		}
-		@return $val;
+		// Otherwise, strip units and convert to px
+		// http://stackoverflow.com/questions/12328259/how-do-you-strip-the-unit-from-any-number-in-sass
+		@else {
+			@return $val / ($val * 0 + 1) * 1px;
+		}
 	}
 
-	@function calc-em( $px, $base: 16px ) {
-		@return ( makePixel($px) / makePixel($base) ) * 1em;
+	/* Convert px to em */
+	@function em( $px, $base: 16px ) {
+		@return ( px($px) / px($base) ) * 1em;
 	}
 
 ## Usage
@@ -18,7 +25,7 @@
 ###Sass:
 
 	.featured {
-		padding: calc-em( 10px );
+		padding: em( 10px );
 	}
 
 ###CSS:
