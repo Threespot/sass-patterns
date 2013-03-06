@@ -1,9 +1,11 @@
-@mixin headings($from: 1, $to: 6){
-    $heading-selector: (unquote(""));
-    @for $i from $from through $to {
-        $heading-selector: $heading-selector, unquote("h#{$i}")
-    }
-    #{$heading-selector} {
-        @content
-    }
+// Generate heading selectors
+// Reference http://jsfiddle.net/csswizardry/NbLg7/
+@mixin headings( $start: 1, $end: 6 ) {
+	$heading-selectors: ();
+	@for $i from $start through $end {
+		$heading-selectors: append( $heading-selectors, h + $i, comma );
+	}
+	#{$heading-selectors} {
+		@content
+	}
 }
