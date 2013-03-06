@@ -1,0 +1,362 @@
+/* ==========================================================================
+   Utility Functions
+   ========================================================================== */
+
+/* Unit Calculations */
+
+// Strip Units
+// http://stackoverflow.com/questions/12328259/how-do-you-strip-the-unit-from-any-number-in-sass
+@function clean( $val ) {
+	@return $val / ($val * 0 + 1);
+}
+
+// Calculate ratio of 2 values
+@function ratio( $val, $context, $unit: 1 ) {
+	// If units are the same, they will cancel out when dividing
+	@if unit( $val ) == unit( $context ) {
+		@return ($val / $context) * $unit;
+	}
+	// If mixed units, clean them before dividing
+	@else {
+		@return ( clean($val) / clean($context) ) * $unit;
+	}
+}
+
+// Convert any number of fixed values to relative
+@function unit-convert( $vals, $context, $units: 1em ) {
+	
+	// Create empty list to append converted values to
+	$output: ();
+	
+	// Loop through each value, convert, and append to $output list
+	@for $i from 1 through length( $vals ) {
+		$val: nth( $vals, $i );
+		// Only convert values in px
+		@if unit( $val ) == 'px' or unit( $val ) == '' {
+			// Convert to specified units
+			$output: append( $output, ratio( $val, $context, $units ), space );
+		}
+		// Otherwise, return the same value
+		@else {
+			$output: append( $output, $val, space );
+		}
+	}
+	
+	// Return converted values
+	@return $output;
+}
+
+// Calculate percentages
+@function percent( $val, $context: 16 ) {
+	@return unit-convert( $val, $context, 100% );
+}
+
+// Calculate rems
+@function rem( $val, $context: 16 ) {
+	@return unit-convert( $val, $context, 1rem );
+}
+
+// Calculate ems
+@function em( $val, $context: 16 ) {
+	@return unit-convert( $val, $context, 1em );
+}
+
+// Set value as percentage
+@function percentage( $val ) {
+	// Return value if already a pecentage
+	@if unit( $val ) == '%' {
+		@return $val;
+	}
+	// Otherwise, strip units and convert to percentage
+	@return clean( $val ) * 100%;
+}
+
+// Set value as px
+@function px( $val ) {
+	// Return value if already in pixels
+	@if unit( $val ) == 'px' {
+		@return $val;
+	}
+	// Otherwise, strip units and convert to px
+	@return clean( $val ) * 1px;
+}
+
+
+/* Colors */
+
+// rgba black shorthand
+@function black( $opacity ) {
+    @return rgba( 0, 0, 0, $opacity );
+}
+
+// rgba white shorthand
+@function white( $opacity ) {
+    @return rgba( 255, 255, 255, $opacity );
+}
+
+
+/* ==========================================================================
+   Utility Mixins
+   ========================================================================== */
+
+// Generate font-size in rem with px fallback
+@mixin font-size( $px ) {
+	font-size: px( $px );
+	font-size: rem( $px );
+}
+
+// Generate heading selectors
+// Reference http://jsfiddle.net/csswizardry/NbLg7/
+@mixin headings( $start: 1, $end: 6 ) {
+	$heading-selectors: ();
+	@for $i from $start through $end {
+		$heading-selectors: append( $heading-selectors, h + $i, comma );
+	}
+	#{$heading-selectors} {
+		@content
+	}
+}
+
+
+// DEPRECIATED - Border Radius
+// @mixin border-radius( $radius ) {
+// 	-webkit-border-radius: $radius; // Safari 3-4, iOS 1-3.2, Android <=1.6
+// 			border-radius: $radius; // Opera 10.5, IE9+, Safari 5, Chrome, Firefox 4+, iOS 4, Android 2.1+
+// }
+
+// Background Color Using RGBA
+@mixin background-rgba( $color, $opacity ) {
+    background-color: $color;
+    background-color: rgba($color, $opacity);  /* Firefox 3+, Safari 3+, Opera 10.10+, Chrome, IE9+ */
+}
+
+// Background Clip
+// useful if you don't want a bg color from leaking outside the border
+@mixin background-clip() {
+	-webkit-background-clip: padding-box;
+	   -moz-background-clip: padding;
+	        background-clip: padding-box;
+}
+
+// Background Image Text Clip (webkit-only, fallback color for others)
+// Reference: http://nimbupani.com/using-background-clip-for-text-with-css-fallback.html
+@mixin background-clip-text( $img, $color: #000, $pos: 0 0, $img-path: '../img/' ) {
+	color: $color; /* Fallback color */
+	-webkit-text-fill-color: transparent;
+	background: -webkit-linear-gradient(transparent, transparent),
+				url($img-path + $img) repeat $pos;
+	background: -o-linear-gradient(transparent, transparent);
+	-webkit-background-clip: text;
+}
+
+// DEPRECIATED - High Resolution Media Query
+// Use Bourbon mixin http://bourbon.io/docs/#hidpi-media-query
+// @mixin hires-mq( $ratio ) {
+// 	@media only screen and (-webkit-min-device-pixel-ratio: $ratio), only screen and (min-resolution: ($ratio * 96) + 'dpi') {
+// 		@content;
+// 	}
+// }
+
+// High Resolution Background Image
+$img-path: '../img/' !default; /* Set image path if not previously defined */
+
+@mixin hires-background-image( $img-name, $extention: png, $w: auto, $h: auto, $dpi: 1.5, $img-path: '../img/' ) {
+	background-image: url( $img-path + $img-name + '.' + $extention );
+	background-repeat: no-repeat;
+	height: $h;
+	width: $w;
+
+	@media only screen and (-webkit-min-device-pixel-ratio: $dpi), only screen and (min-resolution: ($dpi * 96) + 'dpi') {
+		background-image: url( $img-path + $img-name + '@2x.' + $extention );
+		@include background-size($w $h); /* From Bourbon */
+	}
+}
+
+
+// Code for old IE
+$old-ie: false !default;
+
+@mixin old-ie {
+	@if $old-ie {
+		@content;
+	}
+}
+
+
+/* ==========================================================================
+   Responsive Mixins
+   ========================================================================== */
+
+/* Responsive Breakpoint Magic (breakpoint labels, base font size) */
+// References:
+// http://adactio.com/journal/5429/
+// http://thesassway.com/intermediate/responsive-web-design-in-sass-using-media-queries-in-sass-32
+// https://github.com/registerguard/js-media-queries
+
+$fixed-width: false !default;
+
+// Default breakpoints if not defined
+$breakpoints:	small   0    -1,
+				medium  768   0,
+				large   1024  1 !default;
+
+// Default font styles if not defined
+$base-font-size: 16px !default;
+$base-line-height: 1.5 !default;
+
+
+// Get number of breakpoints
+$break-count: length($breakpoints);
+
+// We need to pass in font stack to override the fake font-family on the <html> element
+@mixin mq-breakpoints( $font-stack: "'Helvetica Neue', Arial, Helvetica, sans-serif" ) {
+
+	// Fallback breakpoint label (add "font-size: 100%" if not already setting it elsewhere)
+	html {
+		font-family: 'no-mq';
+		font-size: percent( $base-font-size );
+		line-height: clean( $base-line-height );
+	}
+
+	// Override <html> font-family
+	body { font-family: #{$font-stack} }
+	
+	// Fallback breakpoint label (for modern browsers)
+	body:after {
+		content: 'no-mq';
+		display: none;
+	}
+
+	// Number of breakpoints
+	$break-count: length($breakpoints);
+	
+	// Create index var for use in the @each loop below
+	$index: 1;
+	
+	// Loop through each breakpoint and generate the appropriate media query.
+	// Save the breakpoint label as 'content' on body:after for modern browsers, using the following JS:
+	// window.getComputedStyle(document.body,':after').getPropertyValue('content')
+	// On browsers that don't support the above (iOS 4, old Android), fallback to using font-family on the <html> element.
+	@each $break in $breakpoints {
+		// Default media query
+		$mq: 'screen';
+		
+		// First breakpoint
+		@if $index == 1 {
+			// Get next breakpoint width, subtract 1px
+			$max-width: nth( nth($breakpoints, $index + 1), 2 ) - 1;
+			// Media query string
+			$mq: '(max-width: #{em( $max-width )})';
+		}
+		
+		// Last breakpoint
+		@else if $index == $break-count {
+			// Media query string
+			$mq: '(min-width: #{em( nth($break, 2) )})';
+		}
+		
+		// All other breakpoints
+		@else {
+			// Get next breakpoint width, subtract 1px
+			$max-width: nth( nth($breakpoints, $index + 1), 2 ) - 1;
+			
+			// Media query string
+			$mq: '(min-width: #{em( nth($break, 2) )} ) and ( max-width: #{em( $max-width )} )';
+		}
+		
+		// Generate the media query code
+		@media #{$mq} {
+			html {
+				font-family: '#{nth($break, 1)}';
+				@if length($break) == 3 {
+					font-size: percentage( ($base-font-size + (nth($break, 3)*1)) / 16px );
+				}
+			}
+			body:after { content: '#{nth($break, 1)}' }
+		};
+		
+		// Increment the counter
+		$index: $index + 1;
+	}
+}
+
+
+/* Media Queries */
+// Reference:
+// http://jakearchibald.github.com/sass-ie/
+
+// Var already defined above
+// $fixed-width: false !default;
+
+// Min-width
+@mixin breakpoint( $name ) {
+	$index: 1; // Create index var to use in @each loop
+
+	// Find width cutoff of breakpoint
+	@each $break in $breakpoints {
+		@if $name == nth($break, 1) {
+			
+			// Output plain CSS if fixed width is >= current breakpoint width
+			@if $fixed-width {
+				@if $index == 1 or $fixed-width >= nth($break, 2) {
+					@content;
+				}
+			}
+			// Wrap code in media query
+			@else if $index > 1 {
+				@media only screen and ( min-width: em( nth($break, 2) ) ) {
+					@content;
+				}
+			}
+			// Output plain CSS for smallest breakpoint
+			@else {
+				@content;
+			}
+		}
+		
+		// Increment counter
+		$index: $index + 1;
+	}
+}
+
+// Max-width
+@mixin max-breakpoint( $name ) {
+	$index: 1; // Create index var to use in @each loop
+
+	// Find width cutoff of breakpoint
+	@each $break in $breakpoints {
+		@if $name == nth($break, 1) {
+
+			// Check if fixed width has been set
+			@if $fixed-width {
+				// For first breakpoint, add styles if fixed width is < second breakpoint
+				@if $index == 1 and $fixed-width < px( nth( nth($breakpoints, 2), 2 ) ) {
+					@content;
+				}
+				// For all other breakopints, add styles if fixed width <= breakpoint
+				@else if $index > 1 and $fixed-width <= nth($break, 2) {
+					@content;
+				}
+			}
+			// If not fixed width, add appropriate media query
+			@else if $index < $break-count {
+				// Get next breakpoint width, subtract 1px
+				$max-width: nth( nth($breakpoints, $index + 1), 2 ) - 1;
+				
+				@media only screen and ( max-width: em( $max-width ) ) {
+					@content;
+				}
+			}
+			// Last breakpoint
+			@else {
+				// Use breakpoint width
+				@media only screen and ( max-width: em( nth($break, 2) ) ) {
+					@content;
+				}
+			}
+		}
+		
+		// Increment counter
+		$index: $index + 1;
+	}
+}
