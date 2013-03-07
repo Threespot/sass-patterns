@@ -1,0 +1,56 @@
+// Convert any color format to plain RGB
+@function get-rgb( $color ) {
+	@return rgb( red($color), green($color), blue($color) );
+}
+
+// Mix translucent color with background to make a flat color for IE
+// Reference: https://github.com/rhysburnie/skeleton-compass/blob/master/stylesheets/bones/utilities/_color.scss
+@function color-flatten( $color, $bg-color: white ) {
+	// Get opacity of color, convert to percentage
+	$weight: alpha($color) * 100%;
+	// Mix new flat color
+	@return mix( get-rgb($color), $bg-color, $weight );
+}
+
+// Set old IE flag if not already defined
+$old-ie: false !default;
+
+// Convert any color format to RGBA, with fallback for old IE and optional background color to mix
+// Usage: color-alpha( #abc, 0.5) ) => rgba(170, 187, 204, 0.5) or #d4dde5 for old IE
+@function color-alpha( $color, $opacity: none, $bg-color: white ) {
+	// If color already has alpha value (e.g. rgba, hlsa)
+	@if alpha( $color ) < 1 {
+		// Then check if a second argument was passed
+		@if $opacity == 'none' {
+			// If no second argumentm, set the opacity as the alpha value
+			$opacity: alpha( $color );
+		}
+		// If second argument is a color
+		@else if type-of( $opacity ) == 'color' {
+			// Set the bg-color
+			$bg-color: $opacity;
+			// Set the opacity
+			$opacity: alpha( $color );
+		}
+	}
+	
+	// Output flat color for IE
+	@if $old-ie {
+		// Return flattened color
+		@return color-flatten( rgba( $color, $opacity ), $bg-color );
+	}
+	// Otherwise, return RGBA
+	@else {
+		@return rgba( $color, $opacity );
+	}
+}
+
+// RGBA black shorthand
+@function black( $opacity ) {
+	@return color-alpha( black, $opacity );
+}
+
+// RGBA white shorthand
+@function white( $opacity ) {
+	@return color-alpha( white, $opacity );
+}
