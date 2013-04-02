@@ -249,7 +249,7 @@ Pass a property, color or string of values containing a color, opacity, and an o
 		// CSS shorthand values work fine
 		@include color-prop( border-bottom, 10px solid #F78125, 0.5 );
 	
-		// You can also use an RGBA value and omit the opacity parameter
+		// You can use an RGBA value and omit the opacity parameter
 		@include color-prop( color, rgba(0, 100, 100, 0.5) );
 		
 		// You can also manually set a background color for flat HEX color
@@ -267,7 +267,7 @@ Pass a property, color or string of values containing a color, opacity, and an o
 		border-bottom: 10px solid #fbc092;
 		border-bottom: 10px solid rgba(247, 129, 37, 0.5);
 		
-		// You can also use an RGBA value and omit the opacity parameter
+		// You can use an RGBA value and omit the opacity parameter
 		color: #7fb1b1;
 		color: rgba(0, 100, 100, 0.5);
 		
