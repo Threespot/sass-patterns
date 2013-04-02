@@ -78,7 +78,7 @@ Convert any color format to RGBA, with fallback for old IE and optional base bac
 
 	// Same as color-alpha() function above, but generates both the fallback and modern CSS for any property
 	// Use if not creating a separate old IE stylesheet, otherwise, use color-alpha()
-	@mixin color-prop( $prop, $value, $opacity, $bg-color: white ) {
+	@mixin color-prop( $prop, $value, $opacity: 'none', $bg-color: white ) {
 
 		// Set color to $value by default
 		$color: $value;
@@ -104,6 +104,15 @@ Convert any color format to RGBA, with fallback for old IE and optional base bac
 				}
 				// Increment counter
 				$counter: $counter + 1;
+			}
+		}
+	
+		// Check if color already has an alpha value
+		@if alpha( $color ) < 1 {
+			// Then check if an opacity value was passed
+			@if $opacity == 'none' {
+				// If no opacity, use the color's alpha value
+				$opacity: alpha( $color );
 			}
 		}
 	
@@ -147,12 +156,13 @@ Convert any color format to RGBA, with fallback for old IE and optional base bac
 		// Output CSS
 		#{$prop}: unquote( $flatVal ); // Fallback HEX
 		#{$prop}: unquote( $alphaVal ); // RGBA
-	}
+	} 
+
 
 
 ## color-alpha() Usage
-
-Simply pass a color value and opacity <code>color-alpha( $color, $opacity)</code>
+<p><code>color-alpha( $color, $opacity: none, $bg-color: white )</code></p>
+Pass a color in any format, optional opacity, and an optional background color to use when generating a flat HEX color for IE.
 
 
 ###Sass:
@@ -226,23 +236,42 @@ You can set a custom background color to use when creating the flat color for IE
 
 
 ##color-prop() Usage
+<p><code>color-prop( $prop, $value, $opacity, $bg-color: white )</code></p>
+Pass a property, color or string of values containing a color, opacity, and an optional background color to use when generating a flat HEX color for IE.
 
 
 ###Sass:
 
 	h1 {
-		@include color-prop( background, #fdc url('../img/test.png') repeat-x, 0.3 );
+		// Basic usage
+		@include color-prop( background-color, #fdc, 0.3 );
+	
+		// CSS shorthand values work fine
 		@include color-prop( border-bottom, 10px solid #F78125, 0.5 );
-		@include color-prop( color, #079, 0.5, white );
+	
+		// You can also use an RGBA value and omit the opacity parameter
+		@include color-prop( color, rgba(0, 100, 100, 0.5) );
+		
+		// You can also manually set a background color for flat HEX color
+		@include color-prop( background-color, #fdc, 0.3, #000 );
 	}
 
 ###CSS:
 
 	h1 {
-	  background:  #fff4ef url("../img/test.png") repeat-x;
-	  background:  rgba(255, 221, 204, 0.3) url("../img/test.png") repeat-x;
-	  border-bottom:  10px solid #fbc092;
-	  border-bottom:  10px solid rgba(247, 129, 37, 0.5);
-	  color: #7fbbcc;
-	  color: rgba(0, 119, 153, 0.5);
+		// Basic usage
+		background-color: #fff4ef;
+		background-color: rgba(255, 221, 204, 0.3);
+		
+		// CSS shorthand values work fine
+		border-bottom: 10px solid #fbc092;
+		border-bottom: 10px solid rgba(247, 129, 37, 0.5);
+		
+		// You can also use an RGBA value and omit the opacity parameter
+		color: #7fb1b1;
+		color: rgba(0, 100, 100, 0.5);
+		
+		// You can also manually set a background color for flat HEX color
+		background-color: #4c423d;
+		background-color: rgba(255, 221, 204, 0.3);
 	}

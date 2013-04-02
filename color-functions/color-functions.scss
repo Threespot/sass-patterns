@@ -62,7 +62,7 @@ $old-ie: false !default;
 
 // Same as color-alpha() function above, but generates both the fallback and modern CSS for any property
 // Use if not creating a separate old IE stylesheet, otherwise, use color-alpha()
-@mixin color-prop( $prop, $value, $opacity, $bg-color: white ) {
+@mixin color-prop( $prop, $value, $opacity: 'none', $bg-color: white ) {
 
 	// Set color to $value by default
 	$color: $value;
@@ -88,6 +88,15 @@ $old-ie: false !default;
 			}
 			// Increment counter
 			$counter: $counter + 1;
+		}
+	}
+	
+	// Check if color already has an alpha value
+	@if alpha( $color ) < 1 {
+		// Then check if an opacity value was passed
+		@if $opacity == 'none' {
+			// If no opacity, use the color's alpha value
+			$opacity: alpha( $color );
 		}
 	}
 	
