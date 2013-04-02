@@ -19,21 +19,25 @@ Convert any color format to RGBA, with fallback for old IE and optional base bac
 		@return rgb( red($color), green($color), blue($color) );
 	}
 
+
 	// Mix translucent color with background to make a flat color for IE
 	// Reference: https://github.com/rhysburnie/skeleton-compass/blob/master/stylesheets/bones/utilities/_color.scss
 	@function color-flatten( $color, $bg-color: white ) {
 		// Get opacity of color, convert to percentage
-		$weight: alpha($color) * 100%;
+		$weight: percentage( alpha($color) );
 		// Mix new flat color
 		@return mix( get-rgb($color), $bg-color, $weight );
 	}
+
 
 	// Set old IE flag if not already defined
 	$old-ie: false !default;
 
 	// Convert any color format to RGBA, with fallback for old IE and optional background color to mix
 	// Usage: color-alpha( #abc, 0.5) ) => rgba(170, 187, 204, 0.5) or #d4dde5 for old IE
-	@function color-alpha( $color, $opacity: none, $bg-color: white ) {
+	@function color-alpha( $color, $opacity: none, $bg-color: white, $flat: false ) {
+	
+		// Check the arguments passed
 		// If color already has alpha value (e.g. rgba, hlsa)
 		@if alpha( $color ) < 1 {
 			// Then check if a second argument was passed
@@ -51,7 +55,7 @@ Convert any color format to RGBA, with fallback for old IE and optional base bac
 		}
 	
 		// Output flat color for IE
-		@if $old-ie {
+		@if $flat or $old-ie {
 			// Return flattened color
 			@return color-flatten( rgba( $color, $opacity ), $bg-color );
 		}
@@ -72,7 +76,81 @@ Convert any color format to RGBA, with fallback for old IE and optional base bac
 	}
 
 
-## Usage
+	// Same as color-alpha() function above, but generates both the fallback and modern CSS for any property
+	// Use if not creating a separate old IE stylesheet, otherwise, use color-alpha()
+	@mixin color-prop( $prop, $value, $opacity, $bg-color: white ) {
+
+		// Set color to $value by default
+		$color: $value;
+	
+		// Location in array of color value
+		$colorNth: 1;
+	
+		// Count values passed
+		$valCount: length($value);
+
+		// If mulitple values were passed, determine which is the color
+		// (used for shorthand CSS, like "1px solid #ccc" for border)
+		@if $valCount > 1 {
+			$counter: 1;
+			// Loop through values
+			@each $val in $value {
+				// Check if value is a color
+				@if type-of($val) == color {
+					// Update color value
+					$color: $val;
+					// Save location of color in array
+					$colorNth: $counter;
+				}
+				// Increment counter
+				$counter: $counter + 1;
+			}
+		}
+	
+		// Generate new colors values
+		$flatColor: color-alpha( $color, $opacity, $bg-color, true ); // e.g. #cccccc
+		$alphaColor: color-alpha( $color, $opacity, $bg-color, false ); // e.g. rgba(0, 0, 0, 0.2)
+	
+		// Define new values
+		$flatVal: '';
+		$alphaVal: '';
+	
+		// Rewrite values if multiple were passed
+		@if ( $valCount > 1 ) {
+			$counter: 1;
+			// Loop though original values and replace the color
+			@each $val in $value {
+				// If current val is the color, replace it
+				@if ( $colorNth == $counter ) {
+					// Replace with flat color
+					$flatVal: $flatVal + ' ' + $flatColor;
+					// Replace with alpha color
+					$alphaVal: $alphaVal + ' ' + $alphaColor;
+				}
+				@else {
+					$flatVal: $flatVal + ' ' + $val;
+					$alphaVal: $alphaVal + ' ' + $val;
+				}
+		
+				// Increment counter
+				$counter: $counter + 1;
+			}
+		}
+		@else {
+			$flatVal: $flatColor;
+			$alphaVal: $alphaColor;
+		}
+	
+		@debug $flatVal;
+		@debug $alphaVal;
+	
+		// Output CSS
+		#{$prop}: unquote( $flatVal ); // Fallback HEX
+		#{$prop}: unquote( $alphaVal ); // RGBA
+	}
+
+
+## color-alpha() Usage
 
 Simply pass a color value and opacity <code>color-alpha( $color, $opacity)</code>
 
@@ -144,4 +222,27 @@ You can set a custom background color to use when creating the flat color for IE
 	/* Old IE stylesheet */
 	div {
 		background-color: #4c4c00;
+	}
+
+
+##color-prop() Usage
+
+
+###Sass:
+
+	h1 {
+		@include color-prop( background, #fdc url('../img/test.png') repeat-x, 0.3 );
+		@include color-prop( border-bottom, 10px solid #F78125, 0.5 );
+		@include color-prop( color, #079, 0.5, white );
+	}
+
+###CSS:
+
+	h1 {
+	  background:  #fff4ef url("../img/test.png") repeat-x;
+	  background:  rgba(255, 221, 204, 0.3) url("../img/test.png") repeat-x;
+	  border-bottom:  10px solid #fbc092;
+	  border-bottom:  10px solid rgba(247, 129, 37, 0.5);
+	  color: #7fbbcc;
+	  color: rgba(0, 119, 153, 0.5);
 	}
