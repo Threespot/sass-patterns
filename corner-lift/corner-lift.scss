@@ -1,0 +1,26 @@
+// Corner lift shadows
+// NOTE: Must set an opaque background color on target element
+// Reference: http://www.readitsideways.com/css3_demos/shadows/
+@mixin corner-lift( $color: rgba(0, 0, 0, 0.2), $angle: 3deg, $bottom-offset: 14px ) {
+    $height: 40px; // Default max height shadow can be
+    position: relative;
+    &:before,
+    &:after {
+        bottom: 22px - $bottom-offset;
+        content: '\0020';
+        height: $height;
+        max-width: 50%;
+        position: absolute;
+        width: 50%;
+        z-index: -1;
+        @include box-shadow( 0 15px 5px $color );
+    }
+    &:before {
+        @include transform( skew( -4deg, -$angle ) );
+        left: 1px;
+    }
+    &:after {
+        @include transform( skew( 4deg, $angle ) );
+        right: 1px;
+    }
+}
