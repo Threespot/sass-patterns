@@ -1,5 +1,5 @@
 // Convert any property's values to REMs
-// Requires rem() function from https://github.com/Threespot/sass-patterns/tree/master/calc-units
+// Requires the functions from https://github.com/Threespot/sass-patterns/tree/master/calc-units
 // Reference https://github.com/bitmanic/rem/blob/master/stylesheets/_rem.scss
 @mixin rem( $property, $px-values ) {
     // Print the first line in pixel values
