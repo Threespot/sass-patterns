@@ -1,0 +1,31 @@
+//************************************************************************//
+// Comma separated list items (e.g. tags)
+//
+// Requires: "clearfix", "old-ie", "reset-list"
+//************************************************************************//
+@mixin list-commas {
+  @extend %clearfix;
+  @extend %reset-list;
+
+  li {
+    @include inline-block;
+
+    &:after {
+      content: "\002c\0020";// ", "
+    }
+
+    &:last-child:after {
+      display: none;
+    }
+
+    @include old-ie( 8 ) {
+      .last-child:after {
+        display: none;
+      }
+    }
+  }
+}
+
+%list-commas {
+  @include list-commas;
+}

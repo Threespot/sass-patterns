@@ -1,0 +1,26 @@
+//************************************************************************//
+// DERECATED - Use Bourbon unless IE 7 support is required
+//************************************************************************//
+
+
+//************************************************************************//
+// Inline Block Mixin (Bourbon no longer supports it)
+//
+// Requires: "old-ie"
+//
+// Source: http://compass-style.org/reference/compass/css3/inline_block/
+//************************************************************************//
+@mixin inline-block {
+  display: inline-block;
+  vertical-align: baseline;
+
+  @include old-ie( 7 ) {
+    display: inline;
+    vertical-align: auto;
+    zoom: 1;
+  }
+}
+
+%inline-block {
+  @include inline-block;
+}

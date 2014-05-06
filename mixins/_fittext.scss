@@ -1,0 +1,35 @@
+//************************************************************************//
+// FitText Mixin
+// Based on https://github.com/bookcasey/fittext by @bookcasey
+//************************************************************************//
+@mixin fittext( $min-font-size: 20px, $max-font-size: 80px, $font-increment: 2px, $min-media: 320px, $max-media: auto, $media-increment: auto, $ratio: 1 ) {
+  $font-size: $min-font-size;
+  $media: $min-media;
+
+  // If no max width or increment, set a max of 1200px
+  @if ( $max-media == "auto" and $media-increment == "auto" ) {
+    $max-media: 1200px;
+  }
+
+  // Auto calculate the increment to evenly distribute the breakpoints
+  @if ( $media-increment == "auto" ) {
+    $font-steps: ceil( ($max-font-size - $min-font-size) / $font-increment );
+    $media-span: $max-media - $min-media;
+
+    // Edge case where there are more font steps than pixels between min and max width
+    @if ( $media-span < $font-steps ) {
+      // Update max width to fit all the font steps
+      $max-media: $min-media + $font-steps;
+    }
+
+    $media-increment: floor( ($max-media - $min-media) / $font-steps );
+  }
+
+  @while ( $media <= $max-media ) and ( $font-size <= $max-font-size ) {
+    @media screen and ( min-width: $media ) {
+      @include font-size( $font-size );// Outpus rem and px fallback
+      $font-size: ($font-size + $font-increment) * $ratio;
+      $media: $media + $media-increment;
+    }
+  }
+}

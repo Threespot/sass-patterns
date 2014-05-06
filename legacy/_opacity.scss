@@ -1,0 +1,29 @@
+//************************************************************************//
+// DERECATED unless IE 8/7 support is required
+//************************************************************************//
+
+
+//************************************************************************//
+// Opacity polyfills for old IE
+//
+// Requires: "old-ie"
+//
+// Note: Only use when opacity is required in IE8 or below
+//************************************************************************//
+@mixin opacity( $val ) {
+  // Modern browsers and IE9
+  @include not-old-ie {
+    opacity: $val;
+  }
+
+  // IE 8
+  @include old-ie( 8 ) {
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=#{$val})";
+    filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=#{$val*100});
+  }
+
+  // IE 7 and below
+  @include old-ie( 7 ) {
+    filter: alpha(opacity=#{$val*100});
+  }
+}

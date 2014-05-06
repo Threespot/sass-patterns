@@ -1,0 +1,46 @@
+//************************************************************************//
+// Use gradient and text shadow to create an underline that breaks for descenders
+//
+// Requires: Bourbon, Modernizr with "cssgradients"
+//
+// Based on https://medium.com/designing-medium/7c03a9274f9
+//
+// TODO: Add alternate thickness for highres devices
+//************************************************************************//
+%link-underline-fancy {
+  background-repeat: repeat-x;
+  @include background-size ( 1px 1px );
+  background-position: 0 89%;
+  text-decoration: none;
+
+  .no-cssgradients & {
+    text-shadow: none;
+  }
+
+  &:hover,
+  &:focus,
+  &:active {
+    @include background-image( linear-gradient( to bottom, $trust-page-bg-color 50%, $base-font-color 50%  ) );
+    text-decoration: none;
+    // Add white space between underline and descenders
+    text-shadow: -2px 0px 0px $trust-page-bg-color,
+                 -1px 0px 0px $trust-page-bg-color,
+                  1px 0px 0px $trust-page-bg-color,
+                  2px 0px 0px $trust-page-bg-color;
+
+    .no-cssgradients & {
+      text-decoration: underline;
+      text-shadow: none;
+    }
+  }
+}
+
+%reset-link-underline-fancy {
+  &,
+  &:hover,
+  &:focus,
+  &:active {
+    background: none;
+    text-shadow: none;
+  }
+}

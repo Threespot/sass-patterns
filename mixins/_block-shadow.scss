@@ -1,0 +1,95 @@
+//************************************************************************//
+// Block Shadow Effect using Multiple Text Shadows
+//
+// Requires: "strip"
+//
+// Examples:
+//
+// .foo {
+//   @include block-shadow( #ccc, 5px);
+// }
+//
+// .foo {
+//   text-shadow: 1px 1px 0 #cccccc,
+//                2px 2px 0 #cccccc,
+//                3px 3px 0 #cccccc,
+//                4px 4px 0 #cccccc,
+//                5px 5px 0 #cccccc;
+// }
+//
+//
+// $rainbow: red 2px, orange 2px, yellow 2px, green 2px, blue 2px, purple 2px;
+//
+// .foo {
+//   @include block-shadow( $rainbow );
+// }
+//
+// .foo {
+//   text-shadow: 1px 1px 0 red,
+//                2px 2px 0 red,
+//                3px 3px 0 orange,
+//                4px 4px 0 orange,
+//                5px 5px 0 yellow,
+//                6px 6px 0 yellow,
+//                7px 7px 0 green,
+//                8px 8px 0 green,
+//                9px 9px 0 blue,
+//                10px 10px 0 blue,
+//                11px 11px 0 purple,
+//                12px 12px 0 purple;
+// }
+//
+// Note: For inspiration, see http://practice.typekit.com/lesson/using-shades/
+//************************************************************************//
+@mixin block-shadow( $color: #000, $end-layer: 5px, $x-offset: 1px, $y-offset: 1px, $start-layer: 1px ) {
+  $x: $x-offset * $start-layer;
+  $y: $y-offset * $start-layer;
+  $text-shadow: ();
+
+  @if ( length( $color ) > 1 ) {
+    $color-count: length( $color );
+    $color-index: 1;
+    $current-color: nth( nth($color, $color-index), 1 );
+    $color-size: nth( nth($color, $color-index), 2 );
+
+    // Determine total number of layers
+    $total-layers: 0;
+    @for $l from 1 through $color-count {
+      $total-layers: $total-layers + nth( nth($color, $l), 2 );
+    }
+
+    // Generate text-shadow code
+    $i: 0;
+    @for $t from $start-layer through $total-layers {
+      $x: $x-offset * strip( $t );
+      $y: $y-offset * strip( $t );
+
+      // Update color wih next one
+      @if ( $i == $color-size ) {
+        $i: 0;// Reset counter
+
+        $color-index: $color-index + 1;
+
+        @if ( $color-index <= $color-count ) {
+          $current-color: nth( nth($color, $color-index), 1 );
+          $color-size: nth( nth($color, $color-index), 2 );
+        }
+      }
+
+      // Add text-shadow layer
+      $text-shadow: append( $text-shadow, $x $y 0 $current-color, comma);
+
+      // Increment counter
+      $i: $i + 1;
+    }
+  }
+  @else {
+    @for $n from $start-layer through $end-layer {
+      $x: $x-offset * $n/1px;
+      $y: $y-offset * $n/1px;
+      $text-shadow: append( $text-shadow, $x $y 0 $color, comma);
+    }
+  }
+
+  text-shadow: $text-shadow;
+}
