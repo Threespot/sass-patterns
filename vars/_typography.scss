@@ -1,0 +1,60 @@
+//************************************************************************//
+// Example Typography Vars
+//************************************************************************//
+
+// Font stacks
+$sans: 'Helvetica Neue', 'HelveticaNeue', Arial, Helvetica, 'Roboto', sans-serif;
+$serif: 'Palatino', 'Palatino Linotype', 'Palatino LT STD', 'Book Antiqua', Georgia, 'Times New Roman', serif;
+$condensed: 'Arial Narrow', $sans;
+
+
+// Add debug fonts to help determine when web fonts don't load
+@include debug( false ) {
+  $sans: 'Comic Sans MS', 'ChalkboardSE-Regular', $sans;
+  $serif: 'Papyrus', 'Segoe Script', $serif;
+  $condensed: 'Copperplate', 'Impact', $condensed;
+}
+
+
+// Example Web Font
+$whitney-family: 'Whitney SSm A', 'Whitney SSm B';
+$whitney: $whitney-family, $sans;
+$whitney-light: 300;
+$whitney-book: 400;
+$whitney-semibold: 600;
+$whitney-bold: 700;
+
+
+// Example International Font Stacks
+// Full List of Fonts -  http://jsbin.com/rojil
+$arabic: $whitney-family, 'Adobe Arabic', 'Al Bayan', 'DecoType Naskh', 'Nadeem', 'Sakkal Majalla', 'Arabic Typesetting', 'Traditional Arabic', sans-serif;
+$chinese: $whitney-family, 'STHeitiSC-Light', 'STHeitiTC-Light', 'SimHei', 'Hei', 'STHeiti', 'SimSun-ExtB', $sans;
+$japanese: $whitney-family, 'HiraKakuProN-W3', 'Hiragino Kaku Gothic Pro', 'Hei', 'Meiryo', 'MS Gothic', 'MS PGothic', 'ＭＳ Ｐゴシック', $sans;
+$inuit: $whitney-family, 'Euphemia', 'Euphemia UCAS', 'Euphemia-web', $sans;
+
+// Apply properfont font based on lang attribute
+[lang^=ar] {
+  font-family: $arabic;
+}
+[lang^=zh] {
+  font-family: $chinese;
+}
+[lang^=ja] {
+  font-family: $japanese;
+}
+[lang^=iu] {
+  font-family: $inuit;
+}
+
+
+// Base Font Settings
+$base-font-color: #444;
+$base-font-family: $whitney;
+$base-font-size: 16px; // Sets main body copy size, used by define-breakpoints() mixin
+$base-font-weight: $whitney-book;
+$base-line-height: 1.75;
+
+// Use sytem font in old IE
+@include old-ie {
+  $base-font-family: $sans;
+}

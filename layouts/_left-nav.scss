@@ -1,0 +1,61 @@
+//************************************************************************//
+// Two Column Left Nav Layout (.layout-left-nav)
+//************************************************************************//
+$left-nav-breakpoint: 600px;
+$left-nav-primary-width: 780px;
+$left-nav-secondary-width: 140px;
+
+// Two column with left nav
+%layout-left-nav-primary {
+  @include mq( $left-nav-breakpoint ) {
+    display: table-cell;
+    padding-left: $base-gutter;
+    width: 100%;
+  }
+
+  // IE7 doesn't support table-cell
+  @include old-ie( 7 ) {
+    display: block;
+    float: right;
+    width: $left-nav-primary-width;
+  }
+}
+
+%layout-left-nav-secondary {
+  @include mq( $left-nav-breakpoint ) {
+    display: table-cell;
+    @include rem( padding-bottom, $col-bottom-margin );
+    min-width: $left-nav-secondary-width;// IE8 fix
+    width: $left-nav-secondary-width;
+  }
+
+  @include old-ie( 7 ) {
+    display: block;
+    float: left;
+    width: $left-nav-secondary-width;
+  }
+}
+
+%layout-left-nav {
+  .main-body {
+    @include mq( $left-nav-breakpoint ) {
+      @include table-wrap();
+    }
+  }
+
+  @include old-ie( 8 ) {
+    width: $oldie-fixed-width;
+  }
+
+  .main-secondary-nav {
+    @extend %layout-left-nav-secondary;
+  }
+
+  .main-primary {
+    @extend %layout-left-nav-primary;
+  }
+}
+
+.layout-left-nav {
+  @extend %layout-left-nav;
+}

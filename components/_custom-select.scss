@@ -1,0 +1,119 @@
+//************************************************************************//
+// Requires: custom-select.js
+//
+// Custom Select Styles
+//
+// Based on http://www.456bereastreet.com/lab/custom-select/
+//************************************************************************//
+$select-height: 32px;
+
+// Hide selects initially to prevent FOUC
+select.custom-select {
+  @include opacity( 0 );
+
+  .no-js &,
+  .no-cssanimations & {
+    @include opacity( 1 );
+  }
+}
+
+// Select element is replaced with new markup via JS
+.custom-select {
+  @include font-size( 14px );
+  @include inline-block; // Adds vertical-align: baseline;
+  vertical-align: middle;
+  position: relative;
+
+  select {
+    border: 0;
+    color: $gray;
+    cursor: pointer;
+    display: block;
+    font-weight: bold;
+    @include rem( height, $select-height );
+    @include opacity( 0 );
+    position: relative;
+    width: auto;
+    z-index: 10;
+  }
+
+  div {
+    border: 1px solid $silver;
+    color: $gray;
+    font-weight: bold;
+    @include rem( height, $select-height );
+    left: 0;
+    @include rem( line-height, $select-height - 2 );// Vertical alignment was not quite right, hence the 2px offset
+    overflow: hidden;
+    @include opacity( 0 );
+    padding: 0 2.5em 0 0.5em;
+    text-overflow: ellipsis;
+    top: 0;
+    width: 100%;
+    z-index: 1;
+
+    // Arrow
+    &:after {
+      content: '\0020';
+      display: block;
+      margin-top: -0.15em;
+      position: absolute;
+      top: 50%;
+      right: 0.5em;
+
+      @include triangle( 0.8em, $black, down );
+    }
+
+    // Vertical line
+    &:before {
+      background: $silver;
+      content: '\0020';
+      display: block;
+      height: 70%;
+      position: absolute;
+      @include rem( right, 24px );
+      top: 15%;
+      width: 1px;
+    }
+
+    &.focus {
+      border-color: $blue;
+
+      &:before {
+        background: $blue;
+      }
+    }
+  }
+
+  &.js-init .placeholder {
+    @include opacity( 1 );
+    position: absolute;
+  }
+
+  &.disabled  {
+    select {
+      cursor: not-allowed;
+    }
+
+    div {
+      background: $white;
+
+      &:after {
+        @include triangle(0.8em, $silver, down);
+      }
+    }
+  }
+
+  // Full-width select
+  &--block {
+    display: block;
+
+    select {
+      width: 100%;
+    }
+
+    @include old-ie( 7 ) {
+      width: 100%;
+    }
+  }
+}

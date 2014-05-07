@@ -1,0 +1,62 @@
+//************************************************************************//
+// Two Column Right Rail Layout (.layout-right-rail)
+//************************************************************************//
+$right-rail-breakpoint: 780px;
+$right-rail-primary-width: 600px;
+$right-rail-secondary-width: 300px;
+
+%right-rail-primary {
+  @include mq( $right-rail-breakpoint ) {
+    display: table-cell;
+    padding-right: $base-gutter;
+    width: 100%;
+  }
+
+  // IE7 doesn't support table-cell
+  @include old-ie( 7 ) {
+    display: block;
+    float: left;
+    width: $right-rail-primary-width;
+  }
+}
+
+%right-rail-secondary {
+  @include mq( $right-rail-breakpoint ) {
+    display: table-cell;
+    @include rem( padding-bottom, $col-bottom-margin );
+    min-width: $right-rail-secondary-width;// IE8 fix
+    width: $right-rail-secondary-width;
+  }
+
+  // IE7 doesn't support table-cell
+  @include old-ie( 7 ) {
+    display: block;
+    float: left;
+    width: $right-rail-secondary-width;
+  }
+}
+
+%layout-right-rail {
+  .main-body {
+    @include mq( $right-rail-breakpoint ) {
+      @include table-wrapper();
+    }
+  }
+
+  // IE8 doesn't support media queries
+  @include old-ie( 8 ) {
+    width: $oldie-fixed-width;
+  }
+
+  .main-primary {
+    @extend %right-rail-primary;
+  }
+
+  .main-secondary {
+    @extend %right-rail-secondary;
+  }
+}
+
+.layout-right-rail {
+  @extend %layout-right-rail;
+}

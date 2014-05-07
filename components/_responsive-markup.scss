@@ -1,0 +1,41 @@
+//************************************************************************//
+// Requires: responsive-markup.js, _mq.scss, $breakpoints array
+//
+// Create helper classes to hide elements at each breakpoint
+//************************************************************************//
+
+// Breakpoints array used by media query mixins and responsive JS functions
+// Must match 'breakpoints' var in utils.js
+$breakpoints: base      0  ,
+              narrow    320,
+              small     480,
+              med       640,
+              med-wide  720,
+              wide      960,
+              desktop   1024,
+              full      1280 !default;
+
+// Hide all wrappers by default
+[data-set] {
+  display: none;
+
+  // Show the default component
+  &.show-default {
+    display: block;
+  }
+}
+
+// Generate media queries to show/hide components
+@each $break in $breakpoints {
+  $break-name: nth($break, 1);
+  $break-width: nth($break, 2);
+
+  @include mq( $break-width ) {
+    .js .hide-#{$break-name} {
+      display: none;
+    }
+    .js .show-#{$break-name} {
+      display: block;
+    }
+  }
+}
